@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.33516.290
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Logika", "..\Logika\Logika.csproj", "{AD2FF3A7-D498-4457-BBA4-D28255AF2B7F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dane", "..\Dane\Dane.csproj", "{EC85D728-8344-41C9-A376-2923F2690DCC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Prezentacja", "..\Prezentacja\Prezentacja.csproj", "{A7BB89F6-FD9C-41AD-93DD-9D4A11F2DC89}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AD2FF3A7-D498-4457-BBA4-D28255AF2B7F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AD2FF3A7-D498-4457-BBA4-D28255AF2B7F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AD2FF3A7-D498-4457-BBA4-D28255AF2B7F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AD2FF3A7-D498-4457-BBA4-D28255AF2B7F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EC85D728-8344-41C9-A376-2923F2690DCC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EC85D728-8344-41C9-A376-2923F2690DCC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EC85D728-8344-41C9-A376-2923F2690DCC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EC85D728-8344-41C9-A376-2923F2690DCC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A7BB89F6-FD9C-41AD-93DD-9D4A11F2DC89}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A7BB89F6-FD9C-41AD-93DD-9D4A11F2DC89}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A7BB89F6-FD9C-41AD-93DD-9D4A11F2DC89}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A7BB89F6-FD9C-41AD-93DD-9D4A11F2DC89}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {FD2584F5-9C98-4EAB-B2CD-2E6413D5F519}
+	EndGlobalSection
+EndGlobal
