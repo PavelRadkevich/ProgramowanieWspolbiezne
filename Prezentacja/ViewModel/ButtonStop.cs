@@ -6,7 +6,7 @@ namespace Prezentacja.ViewModel
     public class ButtonStop : ICommand
     {
         Model.Model model;
-        public ButtonStop (Model.Model model)
+        public ButtonStop(Model.Model model)
         {
             this.model = model;
         }

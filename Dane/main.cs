@@ -1,4 +1,4 @@
-﻿namespace Logika
+﻿namespace Dane
 {
     class main
     {
