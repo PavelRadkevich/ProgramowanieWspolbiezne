@@ -12,13 +12,9 @@ using System.Windows.Shapes;
 
 namespace Logika
 {
-    public class Logika
+    public static class Logika
     {
-        public bool moving {  get; set; }
-        public Logika() {
-        } 
-
-        public Ellipse NarysujKule(Window window, Random rnd)
+        public static Ellipse NarysujKule(Window window, Random rnd)
         {
             Ellipse ellipse = new Ellipse();
             ellipse.Width = 40;
@@ -31,18 +27,16 @@ namespace Logika
             return ellipse;
         }
 
-        private Vector GetRandomDirection(Random rnd)
+        private static Vector GetRandomDirection(Random rnd)
         {
             double angle = rnd.NextDouble() * Math.PI * 2; // случайный угол в радианах
             Vector direction = new Vector(Math.Cos(angle), Math.Sin(angle)); // создаем вектор из угла направления
             return direction;
         }
 
-        public int MovingOfBall (Ellipse ellipse, Canvas canvas, Random rnd, int speed, Window window)
+        public static int MovingOfBall (Ellipse ellipse, Canvas canvas, Random rnd, int speed, Window window)
         {
             int count = 0;
-            if (moving)
-            {
                 Application.Current.Dispatcher.Invoke(() =>
                 {
                     double x = Canvas.GetLeft(ellipse);
@@ -79,7 +73,6 @@ namespace Logika
                         Canvas.SetTop(ellipse, y);
                     }
                 });
-            }
             if (count >= 40) return 1;
             else return 0;
         }

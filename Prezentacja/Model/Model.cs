@@ -16,10 +16,10 @@ namespace Prezentacja.Model
         private int speed_;
         public ViewModel.ButtonStart ButtonStart { get; private set; }
         public ViewModel.ButtonStop ButtonStop { get; private set; }
-        public Logika.Logika Logika { get; private set; }
         public Window Window { private get; set; }
         public Canvas canvas { private get; set; }
         private List<Ellipse> ellipses = new List<Ellipse>();
+        public bool moving { get; set; }
         public int speed { 
             get { return speed_; }
             set
@@ -43,9 +43,13 @@ namespace Prezentacja.Model
         }
         public void ButtonStartClick()
         {
-            Logika.moving = true;
+            moving = true;
             canvas = (Canvas)Window.FindName("CanvasMyWindow");
             Drawing();
+        }
+        public void ButtonStopClick()
+        {
+            moving = false;
         }
 
         public void Drawing()
@@ -53,17 +57,17 @@ namespace Prezentacja.Model
             Random rnd = new Random();
             for (int i = 0; i < amount_ - ellipses.Count; i++)
             {
-                ellipses.Add(Logika.NarysujKule(Window, rnd));
+                Ellipse e = Logika.Logika.NarysujKule(Window, rnd);
+                ellipses.Add(e);
+                MovingOfBall(e);
             }
         }
-
-        public void ButtonStopClick()
-        {
-            Logika.moving = false;
-        }
-
         public void CheckEllipses ()
         {
+            if (amount_ < 0)
+            {
+                return;
+            }
             if (ellipses.Count < amount_)
             {
                 Application.Current.Dispatcher.Invoke(() =>
@@ -83,7 +87,6 @@ namespace Prezentacja.Model
                 }
             }
         }
-
         public void DeleteEllipse(Ellipse ellipse)
         {
             Application.Current.Dispatcher.Invoke(() =>
@@ -92,33 +95,53 @@ namespace Prezentacja.Model
                 ellipses.Remove(ellipse);
             });
         }
-
 		public Model()
 		{
             ButtonStart = new ViewModel.ButtonStart(this);
             ButtonStop = new ViewModel.ButtonStop(this);
-            Logika = new Logika.Logika();
-			Task.Run(() =>
-			{
-				while (true)
-				{
-                    CheckEllipses();
-                    if (ellipses.Count != 0) {
+            moving = false;
+            Task.Run(() =>
+            {
+            while (true)
+            {
+                CheckEllipses();
+                    /*if (ellipses.Count != 0 & moving == true) {
                         Random rnd = new Random();
                         foreach (Ellipse ell in ellipses)
                         {
-                            int i = Logika.MovingOfBall(ell, canvas, rnd, speed_, Window);
-                            if (i == 1)
-                            {
-                                DeleteEllipse(ell);
-                                break;
-                            }
-                        }
-                        Thread.Sleep(100);
-                    }
+                                int i = Logika.Logika.MovingOfBall(ell, canvas, rnd, speed_, Window);
+                                if (i == 1)
+                                {
+                                    DeleteEllipse(ell);
+                                    break;
+                                }
+                        } */
+                    Thread.Sleep(50);
+
                 }
 			});
 		}
+
+        public void MovingOfBall(Ellipse ellipse)
+        {
+            Random rnd = new Random();
+            Task.Run(() =>
+            {
+                while (true)
+                {
+                    if (ellipses.Count != 0 & moving == true)
+                    {
+                        int i = Logika.Logika.MovingOfBall(ellipse, canvas, rnd, speed_, Window);
+                        if (i == 1)
+                        {
+                            DeleteEllipse(ellipse);
+                            break;
+                        }
+                        Thread.Sleep(50);
+                    }
+                }
+            });
+        }
 
 	}
 }
