@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 
 namespace Prezentacja.ViewModel
 {
-    internal class ObserveTextBox : INotifyPropertyChanged
+    public class ObserveTextBox : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 

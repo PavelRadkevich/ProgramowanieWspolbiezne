@@ -3,10 +3,10 @@ using System.Windows.Input;
 
 namespace Prezentacja.ViewModel
 {
-    internal class ButtonStart : ICommand
+    public class ButtonStart : ICommand
     {
-        Implementations model;
-        public ButtonStart(Implementations model) 
+        Model.Model model;
+        public ButtonStart(Model.Model model) 
         {
             this.model = model;
         }
