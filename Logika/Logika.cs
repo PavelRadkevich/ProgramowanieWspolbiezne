@@ -1,30 +1,30 @@
-﻿using System;
-using System.Diagnostics;
-using System.Security.Principal;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using Dane;
+using System;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Media;
-using System.Windows.Media.Media3D;
 using System.Windows.Shapes;
 
 namespace Logika
 {
     public static class Logika
     {
-        public static Ellipse NarysujKule(Window window, Random rnd)
+        public static Ball NarysujKule(Window window, Random rnd)
         {
             Ellipse ellipse = new Ellipse();
-            ellipse.Width = 40;
-            ellipse.Height = 40;
-            ellipse.Fill = Brushes.Pink;
-            Canvas.SetLeft(ellipse, rnd.Next(5, 755));
-            Canvas.SetTop(ellipse, rnd.Next(105, 491));
+            ellipse.Width = rnd.Next(10, 70);
+            ellipse.Height = ellipse.Width;
+            SolidColorBrush brush = new SolidColorBrush(Color.FromArgb(255, (byte)rnd.Next(256), (byte)rnd.Next(256), (byte)rnd.Next(256)));
+            ellipse.Fill = brush;
+            Canvas.SetLeft(ellipse, rnd.Next(5, 755 - (int)ellipse.Width));
+            Canvas.SetTop(ellipse, rnd.Next(105, 491 - (int)ellipse.Width));
             Canvas canvas = (Canvas)window.FindName("CanvasMyWindow");
             canvas.Children.Add(ellipse);
-            return ellipse;
+            Ball b = new Ball(ellipse, ellipse.Width);
+            Vector direction = GetRandomDirection(rnd);
+            b.xStep = direction.X;
+            b.yStep = direction.Y;
+            return b;
         }
 
         private static Vector GetRandomDirection(Random rnd)
@@ -34,47 +34,26 @@ namespace Logika
             return direction;
         }
 
-        public static int MovingOfBall (Ellipse ellipse, Canvas canvas, Random rnd, int speed, Window window)
+        public static void MovingOfBall(Ball ball, double speed)
         {
-            int count = 0;
-                Application.Current.Dispatcher.Invoke(() =>
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                double x = Canvas.GetLeft(ball.ellipse);
+                double y = Canvas.GetTop(ball.ellipse);
+                double xTest = x + ball.xStep * speed;
+                double yTest = y + ball.yStep * speed;
+                if (x < 5 || x > 795 - ball.ellipse.Width)
                 {
-                    double x = Canvas.GetLeft(ellipse);
-                    double y = Canvas.GetTop(ellipse);
-                    bool place = false;
-                    while (place == false)
-                    {
-                        place = true;
-                        Vector direction = GetRandomDirection(rnd);
-                        x += direction.X * speed;
-                        y += direction.Y * speed;
-                        if (x < 5 || x > 755)
-                        {
-                            x *= -1;
-                        }
-                        if (y < 105 || y > 491)
-                        {
-                            y *= -1;
-                        }
-                        if (x < 5 || x > 755 || y < 105 || y > 491)
-                        {
-                            place = false;
-                        }
-                        count++;
-                        if (count == 40)
-                        {
-                            break;
-                        }
-                        rnd = new Random();
-                    }
-                    if (count <= 40)
-                    {
-                        Canvas.SetLeft(ellipse, x);
-                        Canvas.SetTop(ellipse, y);
-                    }
-                });
-            if (count >= 40) return 1;
-            else return 0;
+                    ball.xStep *= -1;
+                }
+                if (y < 105 || y > 531 - ball.ellipse.Width)
+                {
+                    ball.yStep *= -1;
+                }
+                Canvas.SetLeft(ball.ellipse, x + ball.xStep * speed);
+                Canvas.SetTop(ball.ellipse, y + ball.yStep * speed);
+            });
+
         }
     }
 }

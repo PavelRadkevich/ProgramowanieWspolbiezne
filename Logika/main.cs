@@ -1,9 +1,7 @@
 ﻿namespace Logika
 {
-    class main
+    internal class main
     {
-        static void Main(string[] args)
-        {
-        }
+        static void Main(string[] args) { }
     }
 }

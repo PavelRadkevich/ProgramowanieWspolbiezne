@@ -8,7 +8,7 @@ namespace Dane
         public Ellipse ellipse { get; set; }
         double diametr { get; set; }
         internal double weight { get; set; }
-        private float density {get; set; }
+        private float density { get; set; }
         public double speed { get; set; }
         public double xStep { get; set; }
         public double yStep { get; set; }
@@ -27,7 +27,7 @@ namespace Dane
 
         public void checkSpeed(double speed)
         {
-            this.speed = speed * weight * 0.0001;
+            this.speed = speed / weight * 500;
         }
 
     }

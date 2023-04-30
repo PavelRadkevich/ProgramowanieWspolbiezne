@@ -77,7 +77,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Dane\Dane.csproj">
-      <Project>{ec85d728-8344-41c9-a376-2923f2690dcc}</Project>
+      <Project>{EC85D728-8344-41C9-A376-2923F2690DCC}</Project>
       <Name>Dane</Name>
     </ProjectReference>
   </ItemGroup>
