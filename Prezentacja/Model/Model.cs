@@ -1,4 +1,5 @@
 ﻿using Dane;
+using Logika;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -25,7 +26,6 @@ namespace Prezentacja.Model
             {
                 speed_ = value;
                 OnPropertyChanged();
-                CheckSpeed();
             }
         }
         public int amount
@@ -47,8 +47,25 @@ namespace Prezentacja.Model
                 while (true)
                 {
                     CheckEllipses();
-                    MovingOfBalls();
-                    Thread.Sleep(10);
+                    Task ruch = Task.Factory.StartNew(() => MovingOfBalls());
+                    ruch.Wait();
+                    if (balls.Count != 0)
+                    {
+                        Node root = new Node
+                        {
+                            ball = balls[0]
+                        };
+                        for (int i = 1; i < balls.Count; i++)
+                        {
+                            lock (balls[i])
+                            {
+                                BinarySearchTree.Insert(root, balls[i]);
+                            }
+
+                        }
+                        CheckCollisions(root);
+                    }
+                    Thread.Sleep(1);
                 }
             });
         }
@@ -66,18 +83,17 @@ namespace Prezentacja.Model
         {
             moving = false;
         }
-
-        public void Drawing()
+        private void Drawing()
         {
             Random rnd = new Random();
             for (int i = 0; i < amount_ - balls.Count; i++)
             {
                 Ball e = Logika.Logika.NarysujKule(Window, rnd);
                 balls.Add(e);
-                e.checkSpeed(speed_);
+                e.calculateSpeed();
             }
         }
-        public void CheckEllipses()
+        private void CheckEllipses()
         {
             if (amount_ < 0)
             {
@@ -102,36 +118,34 @@ namespace Prezentacja.Model
                 }
             }
         }
-        private void CheckSpeed()
+        public void CheckCollisions(Node node)
         {
-            foreach (Ball b in balls)
+            if (node == null)
             {
-                b.checkSpeed(speed_);
+                return;
             }
+            Task left = Task.Factory.StartNew(() => CheckCollisions(node.left));
+            Task right = Task.Factory.StartNew(() => CheckCollisions(node.right));
+            left.Wait();
+            right.Wait();
+            Logika.Logika.CheckCollision(node, node.left);
+            Logika.Logika.CheckCollision(node, node.right);
         }
-        public void DeleteEllipse(Ball ball)
-        {
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                canvas.Children.Remove(ball.ellipse);
-                balls.Remove(ball);
-            });
-        }
-        public void MovingOfBall(Ball ball)
+        private void MovingOfBall(Ball ball)
         {
             if (balls.Count != 0 & moving == true)
             {
-                Logika.Logika.MovingOfBall(ball, ball.speed);
+                Logika.Logika.MovingOfBall(ball, ball.speed * speed_);
             }
         }
-
-        public void MovingOfBalls()
+        private void MovingOfBalls()
         {
             Random rnd = new Random();
             if (balls.Count != 0 & moving == true)
             {
                 foreach (Ball b in balls)
                 {
+
                     Task.Run(() =>
                     {
                         MovingOfBall(b);
