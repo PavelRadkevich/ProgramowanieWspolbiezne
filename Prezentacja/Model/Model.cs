@@ -1,33 +1,33 @@
-﻿using System;
+﻿using Dane;
+using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Shapes;
 
 namespace Prezentacja.Model
 {
     public class Model : ViewModel.ObserveTextBox
     {
-		private int amount_;
+        private int amount_;
         private int speed_;
         public ViewModel.ButtonStart ButtonStart { get; private set; }
         public ViewModel.ButtonStop ButtonStop { get; private set; }
         public Window Window { private get; set; }
         public Canvas canvas { private get; set; }
-        private List<Ellipse> ellipses = new List<Ellipse>();
+        private List<Ball> balls = new List<Ball>();
         public bool moving { get; set; }
-        public int speed { 
+        public int speed
+        {
             get { return speed_; }
             set
             {
-                speed_= value;
+                speed_ = value;
                 OnPropertyChanged();
+                CheckSpeed();
             }
-            }
+        }
         public int amount
         {
             get { return amount_; }
@@ -37,9 +37,24 @@ namespace Prezentacja.Model
                 OnPropertyChanged();
             }
         }
+        public Model()
+        {
+            ButtonStart = new ViewModel.ButtonStart(this);
+            ButtonStop = new ViewModel.ButtonStop(this);
+            moving = false;
+            Task.Run(() =>
+            {
+                while (true)
+                {
+                    CheckEllipses();
+                    MovingOfBalls();
+                    Thread.Sleep(10);
+                }
+            });
+        }
         public int GetCountEllipses()
         {
-            return ellipses.Count;
+            return balls.Count;
         }
         public void ButtonStartClick()
         {
@@ -55,93 +70,78 @@ namespace Prezentacja.Model
         public void Drawing()
         {
             Random rnd = new Random();
-            for (int i = 0; i < amount_ - ellipses.Count; i++)
+            for (int i = 0; i < amount_ - balls.Count; i++)
             {
-                Ellipse e = Logika.Logika.NarysujKule(Window, rnd);
-                ellipses.Add(e);
-                MovingOfBall(e);
+                Ball e = Logika.Logika.NarysujKule(Window, rnd);
+                balls.Add(e);
+                e.checkSpeed(speed_);
             }
         }
-        public void CheckEllipses ()
+        public void CheckEllipses()
         {
             if (amount_ < 0)
             {
                 return;
             }
-            if (ellipses.Count < amount_)
+            if (balls.Count < amount_)
             {
                 Application.Current.Dispatcher.Invoke(() =>
                 {
                     Drawing();
                 });
             }
-            else if (ellipses.Count > amount_)
+            else if (balls.Count > amount_)
             {
-                while (ellipses.Count > amount_)
+                while (balls.Count > amount_)
                 {
                     Application.Current.Dispatcher.Invoke(() =>
                     {
-                        canvas.Children.Remove(ellipses[0]);
-                        ellipses.RemoveAt(0);
+                        canvas.Children.Remove(balls[0].ellipse);
+                        balls.RemoveAt(0);
                     });
                 }
             }
         }
-        public void DeleteEllipse(Ellipse ellipse)
+        private void CheckSpeed()
+        {
+            foreach (Ball b in balls)
+            {
+                b.checkSpeed(speed_);
+            }
+        }
+        public void DeleteEllipse(Ball ball)
         {
             Application.Current.Dispatcher.Invoke(() =>
             {
-                canvas.Children.Remove(ellipse);
-                ellipses.Remove(ellipse);
+                canvas.Children.Remove(ball.ellipse);
+                balls.Remove(ball);
             });
         }
-		public Model()
-		{
-            ButtonStart = new ViewModel.ButtonStart(this);
-            ButtonStop = new ViewModel.ButtonStop(this);
-            moving = false;
-            Task.Run(() =>
+        public void MovingOfBall(Ball ball)
+        {
+            if (balls.Count != 0 & moving == true)
             {
-            while (true)
-            {
-                CheckEllipses();
-                    /*if (ellipses.Count != 0 & moving == true) {
-                        Random rnd = new Random();
-                        foreach (Ellipse ell in ellipses)
-                        {
-                                int i = Logika.Logika.MovingOfBall(ell, canvas, rnd, speed_, Window);
-                                if (i == 1)
-                                {
-                                    DeleteEllipse(ell);
-                                    break;
-                                }
-                        } */
-                    Thread.Sleep(50);
+                Logika.Logika.MovingOfBall(ball, ball.speed);
+            }
+        }
 
-                }
-			});
-		}
-
-        public void MovingOfBall(Ellipse ellipse)
+        public void MovingOfBalls()
         {
             Random rnd = new Random();
-            Task.Run(() =>
+            if (balls.Count != 0 & moving == true)
             {
-                while (true)
+                foreach (Ball b in balls)
                 {
-                    if (ellipses.Count != 0 & moving == true)
+                    Task.Run(() =>
                     {
-                        int i = Logika.Logika.MovingOfBall(ellipse, canvas, rnd, speed_, Window);
-                        if (i == 1)
-                        {
-                            DeleteEllipse(ellipse);
-                            break;
-                        }
-                        Thread.Sleep(50);
-                    }
+                        MovingOfBall(b);
+                    });
                 }
-            });
+                Thread.Sleep(10);
+            }
+
+
         }
 
-	}
+    }
 }
