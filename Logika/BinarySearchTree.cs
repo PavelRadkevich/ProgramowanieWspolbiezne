@@ -1,10 +1,13 @@
 ﻿using Dane;
+using System.Device.Location;
+using System.Drawing;
+using System.Windows.Forms;
 
 namespace Logika
 {
     public static class BinarySearchTree
     {
-        public static void Insert(Node node, Ball ball)
+        public static void InsertX(Node node, Ball ball)
         {
             if (ball.x < node.ball.x)
             {
@@ -17,7 +20,7 @@ namespace Logika
                 }
                 else
                 {
-                    Insert(node.left, ball);
+                    InsertX(node.left, ball);
                 }
             }
             else
@@ -31,7 +34,38 @@ namespace Logika
                 }
                 else
                 {
-                    Insert(node.right, ball);
+                    InsertX(node.right, ball);
+                }
+            }
+        }
+        public static void InsertY(Node node, Ball ball)
+        {
+            if (ball.y < node.ball.y)
+            {
+                if (node.left == null)
+                {
+                    node.left = new Node
+                    {
+                        ball = ball
+                    };
+                }
+                else
+                {
+                    InsertY(node.left, ball);
+                }
+            }
+            else
+            {
+                if (node.right == null)
+                {
+                    node.right = new Node
+                    {
+                        ball = ball
+                    };
+                }
+                else
+                {
+                    InsertY(node.right, ball);
                 }
             }
         }

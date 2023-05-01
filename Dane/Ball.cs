@@ -6,23 +6,14 @@ namespace Dane
 {
     public class Ball
     {
-        private double x_;
-        private double y_;
         public Ellipse ellipse { get; set; }
         public double diametr { get; set; }
+        public double radius { get; set; }
         internal double weight { get; set; }
         private float density { get; set; }
         public double speed { get; set; }
-        public double x
-        {
-            get;
-            set;
-        }
-        public double y
-        {
-            get;
-            set;
-        }
+        public double x { get; set; }
+        public double y { get; set; }
         public Vector2 vector { get; set; }
         public Ball(Ellipse ellipse, double diametr)
         {

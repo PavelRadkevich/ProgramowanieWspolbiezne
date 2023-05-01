@@ -46,12 +46,15 @@ namespace Prezentacja.Model
             {
                 while (true)
                 {
-                    CheckEllipses();
-                    Task ruch = Task.Factory.StartNew(() => MovingOfBalls());
-                    ruch.Wait();
-                    if (balls.Count != 0)
+                    Task checkEll = Task.Factory.StartNew(() => CheckEllipses());
+                    checkEll.Wait();
+                    if (balls.Count != 0 && moving == true)
                     {
-                        Node root = new Node
+                        Node rootX = new Node
+                        {
+                            ball = balls[0]
+                        };
+                        Node rootY = new Node
                         {
                             ball = balls[0]
                         };
@@ -59,13 +62,22 @@ namespace Prezentacja.Model
                         {
                             lock (balls[i])
                             {
-                                BinarySearchTree.Insert(root, balls[i]);
+                                Task binaryTreeX = Task.Factory.StartNew(() => BinarySearchTree.InsertX(rootX, balls[i]));
+                                binaryTreeX.Wait();
+                                Task binaryTreeY = Task.Factory.StartNew(() => BinarySearchTree.InsertY(rootY, balls[i]));
+                                binaryTreeY.Wait();
                             }
-
                         }
-                        CheckCollisions(root);
+                        Task collisionX = Task.Factory.StartNew(() => CheckCollisions(rootX));
+                        collisionX.Wait();
+                        //Task collisionY = Task.Factory.StartNew(() => CheckCollisions(rootY));
+                        //collisionY.Wait();
+                        Task coordinates = Task.Factory.StartNew(() => CheckCoordinates());
+                        coordinates.Wait();
+                        Task ruch = Task.Factory.StartNew(() => MovingOfBalls());
+                        ruch.Wait();
                     }
-                    Thread.Sleep(1);
+                    //Thread.Sleep(1);
                 }
             });
         }
@@ -137,6 +149,23 @@ namespace Prezentacja.Model
             {
                 Logika.Logika.MovingOfBall(ball, ball.speed * speed_);
             }
+        }
+        public void CheckCoordinates()
+        {
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                foreach (Ball ball in balls)
+                {
+                    if (ball.x != Canvas.GetLeft(ball.ellipse))
+                    {
+                        Canvas.SetLeft(ball.ellipse, ball.x);
+                    }
+                    if (ball.y != Canvas.GetTop(ball.ellipse))
+                    {
+                        Canvas.SetTop(ball.ellipse, ball.y);
+                    }
+                }
+            });
         }
         private void MovingOfBalls()
         {
