@@ -19,6 +19,7 @@ namespace Dane
         {
             this.ellipse = ellipse;
             this.diametr = diametr;
+            this.radius = diametr / 2;
             density = 1;
             calculateWeight();
 
@@ -31,7 +32,7 @@ namespace Dane
 
         public void calculateSpeed()
         {
-            this.speed = 1 / weight * 1000;
+            this.speed = 1 / weight * 250;
         }
 
     }
