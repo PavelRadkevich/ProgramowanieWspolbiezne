@@ -19,6 +19,8 @@ namespace Prezentacja.Model
         public Canvas canvas { private get; set; }
         private List<Ball> balls = new List<Ball>();
         public bool moving { get; set; }
+        private Node rootX { get; set; } = new Node ();
+        private Node rootY { get; set; } = new Node ();
         public int speed
         {
             get { return speed_; }
@@ -50,11 +52,11 @@ namespace Prezentacja.Model
                     checkEll.Wait();
                     if (balls.Count != 0 && moving == true)
                     {
-                        Node rootX = new Node
+                        rootX = new Node
                         {
                             ball = balls[0]
                         };
-                        Node rootY = new Node
+                        rootY = new Node
                         {
                             ball = balls[0]
                         };
@@ -68,12 +70,12 @@ namespace Prezentacja.Model
                                 binaryTreeY.Wait();
                             }
                         }
-                        Task collisionX = Task.Factory.StartNew(() => CheckCollisions(rootX));
-                        collisionX.Wait();
+                        //Task collisionX = Task.Factory.StartNew(() => CheckCollisions(rootX));
+                        //collisionX.Wait();
                         //Task collisionY = Task.Factory.StartNew(() => CheckCollisions(rootY));
                         //collisionY.Wait();
-                        Task coordinates = Task.Factory.StartNew(() => CheckCoordinates());
-                        coordinates.Wait();
+                        //Task coordinates = Task.Factory.StartNew(() => CheckCoordinates());
+                        //coordinates.Wait();
                         Task ruch = Task.Factory.StartNew(() => MovingOfBalls());
                         ruch.Wait();
                     }
@@ -89,6 +91,7 @@ namespace Prezentacja.Model
         {
             moving = true;
             canvas = (Canvas)Window.FindName("CanvasMyWindow");
+            BuildTrees();
             Drawing();
         }
         public void ButtonStopClick()
@@ -100,9 +103,10 @@ namespace Prezentacja.Model
             Random rnd = new Random();
             for (int i = 0; i < amount_ - balls.Count; i++)
             {
-                Ball e = Logika.Logika.NarysujKule(Window, rnd);
-                balls.Add(e);
-                e.calculateSpeed();
+                Ball ball = Logika.Logika.NarysujKule(Window, rnd);
+                balls.Add(ball);
+                ball.calculateSpeed();
+                SetCoordinates(ball);
             }
         }
         private void CheckEllipses()
@@ -130,25 +134,19 @@ namespace Prezentacja.Model
                 }
             }
         }
-        public void CheckCollisions(Node node)
+        public bool CheckCollisions(Node node)
         {
             if (node == null)
             {
-                return;
+                return false;
             }
             Task left = Task.Factory.StartNew(() => CheckCollisions(node.left));
             Task right = Task.Factory.StartNew(() => CheckCollisions(node.right));
             left.Wait();
             right.Wait();
-            Logika.Logika.CheckCollision(node, node.left);
-            Logika.Logika.CheckCollision(node, node.right);
-        }
-        private void MovingOfBall(Ball ball)
-        {
-            if (balls.Count != 0 & moving == true)
-            {
-                Logika.Logika.MovingOfBall(ball, ball.speed * speed_);
-            }
+            if (Logika.Logika.CheckCollision(node, node.left)) return true;
+            if (Logika.Logika.CheckCollision(node, node.right)) return true;
+            return false;
         }
         public void CheckCoordinates()
         {
@@ -167,23 +165,66 @@ namespace Prezentacja.Model
                 }
             });
         }
+        public void SetCoordinates(Ball ball)
+        {
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                if (ball.x != Canvas.GetLeft(ball.ellipse))
+                {
+                    Canvas.SetLeft(ball.ellipse, ball.x);
+                }
+                if (ball.y != Canvas.GetTop(ball.ellipse))
+                {
+                    Canvas.SetTop(ball.ellipse, ball.y);
+                }
+            });
+        }
         private void MovingOfBalls()
         {
             Random rnd = new Random();
-            if (balls.Count != 0 & moving == true)
+            foreach (Ball b in balls)
             {
-                foreach (Ball b in balls)
+                if (balls.Count != 0 & moving == true)
                 {
-
                     Task.Run(() =>
-                    {
-                        MovingOfBall(b);
-                    });
+                        {
+                        lock (b)
+                        {
+                            Point point = Logika.Logika.PointMovingOfBall(b, b.speed * speed_);
+                            b.x = point.X;
+                            b.y = point.Y;
+                                if (CheckCollisions(rootX)) {
+                                    Logika.Logika.MovingOfBall(b, b.speed * speed_, point);
+                                }
+                                else
+                                {
+                                    CheckCollisions(rootY);
+                                    Logika.Logika.MovingOfBall(b, b.speed * speed_, point);
+                                }
+                                //BuildTrees();
+                        }
+                        });
                 }
-                Thread.Sleep(10);
+                Thread.Sleep(1);
             }
-
-
+        }
+        private void BuildTrees()
+        {
+            rootX = new Node
+            {
+                ball = balls[0]
+            };
+            rootY = new Node
+            {
+                ball = balls[0]
+            };
+            for (int i = 1; i < balls.Count; i++)
+            {
+                    Task binaryTreeX = Task.Factory.StartNew(() => BinarySearchTree.InsertX(rootX, balls[i]));
+                    binaryTreeX.Wait();
+                    Task binaryTreeY = Task.Factory.StartNew(() => BinarySearchTree.InsertY(rootY, balls[i]));
+                    binaryTreeY.Wait();
+            }
         }
 
     }

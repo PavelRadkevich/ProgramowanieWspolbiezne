@@ -36,45 +36,51 @@ namespace Logika
             return direction;
         }
 
-        public static void MovingOfBall(Ball ball, double speed)
+        public static Point PointMovingOfBall(Ball ball, double speed)
         {
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                double x = Canvas.GetLeft(ball.ellipse);
-                double y = Canvas.GetTop(ball.ellipse);
+                double x = ball.x;
+                double y = ball.y;
                 double xTest = x + ball.vector.X * speed;
                 double yTest = y + ball.vector.Y * speed;
-                if (x < 5 || x > 795 - ball.ellipse.Width)
+                if (xTest < 5 || xTest > 795 - ball.diametr)
                 {
                     ball.vector = new Vector2(ball.vector.X * -1, ball.vector.Y);
                 }
-                if (y < 105 || y > 531 - ball.ellipse.Width)
+                if (yTest < 105 || yTest > 531 - ball.diametr)
                 {
                     ball.vector = new Vector2(ball.vector.X, ball.vector.Y * -1);
                 }
-                Canvas.SetLeft(ball.ellipse, x + ball.vector.X * speed);
-                Canvas.SetTop(ball.ellipse, y + ball.vector.Y * speed);
+            Point point = new Point(x + ball.vector.X * speed, y + ball.vector.Y * speed);
+            return point;
+        }
+        public static void MovingOfBall(Ball ball, double speed, Point point)
+        {
+            Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+            {
+                Canvas.SetLeft(ball.ellipse, point.X);
+                Canvas.SetTop(ball.ellipse, point.Y);
                 ball.x = Canvas.GetLeft(ball.ellipse);
                 ball.y = Canvas.GetTop(ball.ellipse);
-            });
-
+            }));
         }
 
-        public static void CheckCollision(Node node1, Node node2)
+        public static bool CheckCollision(Node node1, Node node2)
         {
             if (node1 == null || node2 == null)
             {
-                return;
+                return false;
             }
-            double distance = Math.Sqrt(Math.Pow((node1.ball.x - node1.ball.radius) - (node2.ball.x - node2.ball.radius), 2) + Math.Pow((node1.ball.y - node1.ball.radius) - (node2.ball.y - node2.ball.radius), 2));
-            if (distance < node1.ball.diametr / 2 + node2.ball.radius)
+            double distance = Math.Sqrt(Math.Pow((node1.ball.x + node1.ball.radius) - (node2.ball.x + node2.ball.radius), 2) + Math.Pow((node1.ball.y + node1.ball.radius) - (node2.ball.y + node2.ball.radius), 2));
+            if (distance < node1.ball.radius + node2.ball.radius)
             {
                 Console.WriteLine("Kolizja!");
                 lock (node1)
                 {
                     CollisionHandling(node1.ball, node2.ball, distance);
+                    return true;
                 }
             }
+            return false;
         }
         public static void CollisionHandling(Ball ball1, Ball ball2, double distance)
         {
@@ -98,5 +104,7 @@ namespace Logika
             ball2.x -= Vector2.Subtract(center1, center2).X - ball2.radius - ball1.radius;
             ball2.y -= Vector2.Subtract(center1, center2).Y - ball2.radius - ball1.radius;*/
         }
+
+
     }
 }
