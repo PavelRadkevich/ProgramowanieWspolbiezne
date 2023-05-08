@@ -1,18 +1,23 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Prezentacja;
+using Prezentacja.Model;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace Prezentacja.Tests
+namespace Testy
 {
     [TestClass]
     public class ModelTest
     {
         [TestMethod]
-        public void ButtonStartClickTest()
+        public void ModelConstructorTest()
         {
-            Model.Model model = new Model.Model
-            {
-                amount = 10
-            };
-            Assert.IsTrue(0 == model.GetCountEllipses());
+            MainWindow mainWindow = new MainWindow();
+            Model model = new Model();
+
         }
     }
 }

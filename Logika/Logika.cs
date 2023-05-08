@@ -10,26 +10,26 @@ namespace Logika
 {
     public static class Logika
     {
-        public static Ball NarysujKule(Window window, Random rnd)
+        public static Ball DrawBall(Window window, Random rnd)
         {
-            Ellipse ellipse = new Ellipse();
-            ellipse.Width = rnd.Next(20, 70);
-            ellipse.Height = ellipse.Width;
+            Double HW = rnd.Next(20, 70);
             SolidColorBrush brush = new SolidColorBrush(Color.FromArgb(255, (byte)rnd.Next(256), (byte)rnd.Next(256), (byte)rnd.Next(256)));
-            ellipse.Fill = brush;
+            Ellipse ellipse = new Ellipse
+            {
+                Width = HW,
+                Height = HW,
+                Fill = brush
+            };
             Canvas.SetLeft(ellipse, rnd.Next(5, 755 - (int)ellipse.Width));
             Canvas.SetTop(ellipse, rnd.Next(105, 491 - (int)ellipse.Width));
             Canvas canvas = (Canvas)window.FindName("CanvasMyWindow");
             canvas.Children.Add(ellipse);
-            Ball b = new Ball(ellipse, ellipse.Width);
             Vector2 direction = GetRandomDirection(rnd);
-            b.vector = direction;
-            b.x = Canvas.GetLeft(b.ellipse);
-            b.y = Canvas.GetTop(b.ellipse);
+            Ball b = new Ball(ellipse, ellipse.Width, Canvas.GetLeft(ellipse), Canvas.GetTop(ellipse), direction);
             return b;
         }
 
-        private static Vector2 GetRandomDirection(Random rnd)
+        public static Vector2 GetRandomDirection(Random rnd)
         {
             double angle = rnd.NextDouble() * Math.PI * 2; // случайный угол в радианах
             Vector2 direction = new Vector2((float)Math.Cos(angle), (float)Math.Sin(angle)); // создаем вектор из угла направления
@@ -71,7 +71,7 @@ namespace Logika
                 return false;
             }
             double distance = Math.Sqrt(Math.Pow((node1.ball.x + node1.ball.radius) - (node2.ball.x + node2.ball.radius), 2) + Math.Pow((node1.ball.y + node1.ball.radius) - (node2.ball.y + node2.ball.radius), 2));
-            if (distance < node1.ball.radius + node2.ball.radius)
+            if (distance <= node1.ball.radius + node2.ball.radius)
             {
                 Console.WriteLine("Kolizja!");
                 lock (node1)
@@ -99,12 +99,14 @@ namespace Logika
 
             ball1.vector = res1;
             ball2.vector = res2;
-            /*ball1.x -= Vector2.Subtract(center2, center1).X - ball2.radius - ball1.radius;
-            ball1.y -= Vector2.Subtract(center2, center1).Y - ball2.radius - ball1.radius;
-            ball2.x -= Vector2.Subtract(center1, center2).X - ball2.radius - ball1.radius;
-            ball2.y -= Vector2.Subtract(center1, center2).Y - ball2.radius - ball1.radius;*/
+
+            double speed1 = ((ball1.weight - ball2.weight) * ball1.speed + 2 * ball2.weight * ball2.speed) / (ball1.weight + ball2.weight);
+            double speed2 = ((ball2.weight - ball1.weight) * ball2.speed + 2 * ball1.weight * ball1.speed) / (ball1.weight + ball2.weight);
+
+            ball1.speed = speed1;
+            ball2.speed = speed2;
         }
 
-
+        static void Main(string[] args) { }
     }
 }

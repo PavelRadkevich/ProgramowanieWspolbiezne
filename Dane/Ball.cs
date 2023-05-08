@@ -4,36 +4,36 @@ using System.Windows.Shapes;
 
 namespace Dane
 {
-    public class Ball
+    public class Ball: IBall
     {
         public Ellipse ellipse { get; set; }
         public double diametr { get; set; }
         public double radius { get; set; }
-        internal double weight { get; set; }
-        private float density { get; set; }
+        public double weight { get; set; }
+        private float density { get; set; } = 1;
         public double speed { get; set; }
         public double x { get; set; }
         public double y { get; set; }
         public Vector2 vector { get; set; }
-        public Ball(Ellipse ellipse, double diametr)
+        public Ball(Ellipse ellipse, double diametr, double x, double y, Vector2 direction)
         {
+            this.vector = direction;
+            this.x = x;
+            this.y = y;
             this.ellipse = ellipse;
             this.diametr = diametr;
-            this.radius = diametr / 2;
-            density = 1;
-            calculateWeight();
+            radius = diametr / 2;
+            weight = density * Math.PI * Math.Pow(diametr, 2) / 4;
+            speed = 1 / weight * 250;
 
         }
-
-        private void calculateWeight()
+        static void Main()
         {
-            this.weight = density * Math.PI * Math.Pow(diametr, 2) / 4;
         }
 
-        public void calculateSpeed()
+        public void NullMethod()
         {
-            this.speed = 1 / weight * 250;
+            throw new NotImplementedException();
         }
-
     }
 }

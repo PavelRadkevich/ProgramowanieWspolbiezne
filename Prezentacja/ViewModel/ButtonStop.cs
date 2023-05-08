@@ -19,7 +19,7 @@ namespace Prezentacja.ViewModel
 
         public void Execute(object parameter)
         {
-            model.ButtonStopClick();
+            model.moving = false;
         }
     }
 }

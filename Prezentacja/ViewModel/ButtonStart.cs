@@ -20,7 +20,7 @@ namespace Prezentacja.ViewModel
 
         public void Execute(object parameter)
         {
-            model.ButtonStartClick();
+            model.moving = true;
         }
     }
 }

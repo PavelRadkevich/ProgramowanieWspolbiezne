@@ -1,5 +1,6 @@
 ﻿using Dane;
 using Logika;
+using Prezentacja.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -17,10 +18,10 @@ namespace Prezentacja.Model
         public ViewModel.ButtonStop ButtonStop { get; private set; }
         public Window Window { private get; set; }
         public Canvas canvas { private get; set; }
-        private List<Ball> balls = new List<Ball>();
+        public List<Ball> balls = new List<Ball>();
         public bool moving { get; set; }
-        private Node rootX { get; set; } = new Node ();
-        private Node rootY { get; set; } = new Node ();
+        public Node rootX { get; set; } = new Node ();
+        public Node rootY { get; set; } = new Node ();
         public int speed
         {
             get { return speed_; }
@@ -64,56 +65,31 @@ namespace Prezentacja.Model
                         {
                             lock (balls[i])
                             {
-                                Task binaryTreeX = Task.Factory.StartNew(() => BinarySearchTree.InsertX(rootX, balls[i]));
-                                binaryTreeX.Wait();
-                                Task binaryTreeY = Task.Factory.StartNew(() => BinarySearchTree.InsertY(rootY, balls[i]));
-                                binaryTreeY.Wait();
+                                BuildTrees();
                             }
                         }
-                        //Task collisionX = Task.Factory.StartNew(() => CheckCollisions(rootX));
-                        //collisionX.Wait();
-                        //Task collisionY = Task.Factory.StartNew(() => CheckCollisions(rootY));
-                        //collisionY.Wait();
-                        //Task coordinates = Task.Factory.StartNew(() => CheckCoordinates());
-                        //coordinates.Wait();
                         Task ruch = Task.Factory.StartNew(() => MovingOfBalls());
                         ruch.Wait();
                     }
-                    //Thread.Sleep(1);
                 }
             });
         }
-        public int GetCountEllipses()
-        {
-            return balls.Count;
-        }
-        public void ButtonStartClick()
-        {
-            moving = true;
-            canvas = (Canvas)Window.FindName("CanvasMyWindow");
-            BuildTrees();
-            Drawing();
-        }
-        public void ButtonStopClick()
-        {
-            moving = false;
-        }
-        private void Drawing()
+        public void Drawing()
         {
             Random rnd = new Random();
-            for (int i = 0; i < amount_ - balls.Count; i++)
+            canvas = (Canvas)Window.FindName("CanvasMyWindow");
+            for (int i = balls.Count; i < amount_; i++)
             {
-                Ball ball = Logika.Logika.NarysujKule(Window, rnd);
+                
+                Ball ball = (Ball)Logika.Logika.DrawBall(Window, rnd);
                 balls.Add(ball);
-                ball.calculateSpeed();
-                SetCoordinates(ball);
             }
         }
-        private void CheckEllipses()
+        public void CheckEllipses()
         {
             if (amount_ < 0)
             {
-                return;
+                throw new NegativeAmountException("Amount(" + amount + ") is negative number");
             }
             if (balls.Count < amount_)
             {
@@ -148,38 +124,7 @@ namespace Prezentacja.Model
             if (Logika.Logika.CheckCollision(node, node.right)) return true;
             return false;
         }
-        public void CheckCoordinates()
-        {
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                foreach (Ball ball in balls)
-                {
-                    if (ball.x != Canvas.GetLeft(ball.ellipse))
-                    {
-                        Canvas.SetLeft(ball.ellipse, ball.x);
-                    }
-                    if (ball.y != Canvas.GetTop(ball.ellipse))
-                    {
-                        Canvas.SetTop(ball.ellipse, ball.y);
-                    }
-                }
-            });
-        }
-        public void SetCoordinates(Ball ball)
-        {
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                if (ball.x != Canvas.GetLeft(ball.ellipse))
-                {
-                    Canvas.SetLeft(ball.ellipse, ball.x);
-                }
-                if (ball.y != Canvas.GetTop(ball.ellipse))
-                {
-                    Canvas.SetTop(ball.ellipse, ball.y);
-                }
-            });
-        }
-        private void MovingOfBalls()
+        public void MovingOfBalls()
         {
             Random rnd = new Random();
             foreach (Ball b in balls)
@@ -201,14 +146,13 @@ namespace Prezentacja.Model
                                     CheckCollisions(rootY);
                                     Logika.Logika.MovingOfBall(b, b.speed * speed_, point);
                                 }
-                                //BuildTrees();
                         }
                         });
                 }
                 Thread.Sleep(1);
             }
         }
-        private void BuildTrees()
+        public void BuildTrees()
         {
             rootX = new Node
             {
