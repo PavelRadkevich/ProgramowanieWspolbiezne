@@ -4,7 +4,7 @@ using System.Windows.Shapes;
 
 namespace Dane
 {
-    public class Ball: IBall
+    public class Ball
     {
         public Ellipse ellipse { get; set; }
         public double diametr { get; set; }
@@ -33,6 +33,9 @@ namespace Dane
 
         public void NullMethod()
         {
+            throw new NotImplementedException();
+        }
+        public Ball() {
             throw new NotImplementedException();
         }
     }

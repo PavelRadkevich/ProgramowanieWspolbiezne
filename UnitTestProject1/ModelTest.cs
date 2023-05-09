@@ -3,11 +3,7 @@ using Moq;
 using Prezentacja;
 using Prezentacja.Exceptions;
 using Prezentacja.Model;
-using System;
-using System.Runtime.Hosting;
-using System.Threading;
 using System.Windows;
-using System.Windows.Threading;
 
 namespace Tests
 {
