@@ -10,7 +10,6 @@ namespace Dane
 {
     public class Ball
     {
-        public Boolean active;
         public Ellipse ellipse { get; set; }
         public double diametr { get; set; }
         public double radius { get; set; }
@@ -21,6 +20,8 @@ namespace Dane
         public double y { get; set; }
         public Vector2 vector { get; set; }
         public int numberOfBall { get; set; }
+        private int numberOfLine { get; set; }
+        private int lengthOfData { get; set; }
         private Task Logs;
         public Ball(Ellipse ellipse, double diametr, double x, double y, Vector2 direction, int numberOfBall)
         {
@@ -33,18 +34,15 @@ namespace Dane
             radius = diametr / 2;
             weight = density * Math.PI * Math.Pow(diametr, 2) / 4;
             speed = 1 / weight * 250;
-            active = true;
-            this.Logs = Task.Factory.StartNew(() => sendDiagnostic());
+            sendDiagnostic();
+            var Lines = File.ReadAllLines("H:\\Study\\IV Semestr\\2.2 Programowanie Wsppolbiezne\\Logs\\Ball" + numberOfBall + "Log.xml");
+            lengthOfData = Lines.Length;
+            numberOfLine = lengthOfData;
         }
 
-        private void sendDiagnostic()
+        public void sendDiagnostic()
         {
-            Task.Run(() =>
-            {
-                while (true)
-                {
-                    if (active)
-                    {
+
                         DiagnosticData data = new DiagnosticData
                         {
                             numberOfBall = this.numberOfBall,
@@ -55,23 +53,16 @@ namespace Dane
                             vector = this.vector
                         };
                         XmlSerializer xml = new XmlSerializer(typeof(DiagnosticData));
-                        using (TextWriter sw = new StreamWriter("H:\\Study\\IV Semestr\\2.2 Programowanie Wsppolbiezne\\Logs\\Ball" + numberOfBall + "Log.xml"))
+                        using (TextWriter sw = new StreamWriter("H:\\Study\\IV Semestr\\2.2 Programowanie Wsppolbiezne\\Logs\\Ball" + numberOfBall + "Log.xml", true))
                         {
                             xml.Serialize(sw, data);
                         }
-                        Thread.Sleep(3000);
-                    }
-                    else
-                    {
-                        return;
-                    }
-                }
-            });
-        }
-
-        public void NullMethod()
-        {
-            throw new NotImplementedException();
+                         numberOfLine += lengthOfData;
+            if (numberOfLine > 1000)
+            {
+                File.WriteAllText("H:\\Study\\IV Semestr\\2.2 Programowanie Wsppolbiezne\\Logs\\Ball" + numberOfBall + "Log.xml", string.Empty);
+                numberOfLine  = 0;
+            }
         }
         public Ball() {
             throw new NotImplementedException();

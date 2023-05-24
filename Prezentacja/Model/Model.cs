@@ -46,6 +46,7 @@ namespace Prezentacja.Model
             ButtonStart = new ViewModel.ButtonStart(this);
             ButtonStop = new ViewModel.ButtonStop(this);
             moving = false;
+            Task Logs = Task.Factory.StartNew(() => sendDiagnostics());
             Task.Run(() =>
             {
                 while (true)
@@ -107,7 +108,6 @@ namespace Prezentacja.Model
                     Application.Current.Dispatcher.Invoke(() =>
                     {
                         canvas.Children.Remove(balls[0].ellipse);
-                        balls[0].active = false;
                         balls.RemoveAt(0);
                     });
                 }
@@ -171,6 +171,17 @@ namespace Prezentacja.Model
                 Task binaryTreeY = Task.Factory.StartNew(() => BinarySearchTree.InsertY(rootY, balls[i]));
                 binaryTreeX.Wait();
                 binaryTreeY.Wait();
+            }
+        }
+        private async void sendDiagnostics()
+        {
+            while (true)
+            {
+                foreach (Ball b in balls)
+                {
+                    b.sendDiagnostic();
+                }
+                await Task.Delay(1000);
             }
         }
 

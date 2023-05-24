@@ -5,10 +5,5 @@
         public Ball ball { get; set; }
         public Node left { get; set; }
         public Node right { get; set; }
-
-        public void NullMethod()
-        {
-            throw new System.NotImplementedException();
-        }
     }
 }
