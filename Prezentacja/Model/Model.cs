@@ -40,6 +40,7 @@ namespace Prezentacja.Model
                 OnPropertyChanged();
             }
         }
+        private int numberOfBall = 0;
         public Model()
         {
             ButtonStart = new ViewModel.ButtonStart(this);
@@ -81,8 +82,9 @@ namespace Prezentacja.Model
             for (int i = balls.Count; i < amount_; i++)
             {
                 
-                Ball ball = (Ball)Logika.Logika.DrawBall(Window, rnd);
+                Ball ball = (Ball)Logika.Logika.DrawBall(Window, rnd, numberOfBall);
                 balls.Add(ball);
+                numberOfBall++;
             }
         }
         public void CheckEllipses()
@@ -105,6 +107,7 @@ namespace Prezentacja.Model
                     Application.Current.Dispatcher.Invoke(() =>
                     {
                         canvas.Children.Remove(balls[0].ellipse);
+                        balls[0].active = false;
                         balls.RemoveAt(0);
                     });
                 }
@@ -164,10 +167,10 @@ namespace Prezentacja.Model
             };
             for (int i = 1; i < balls.Count; i++)
             {
-                    Task binaryTreeX = Task.Factory.StartNew(() => BinarySearchTree.InsertX(rootX, balls[i]));
-                    binaryTreeX.Wait();
-                    Task binaryTreeY = Task.Factory.StartNew(() => BinarySearchTree.InsertY(rootY, balls[i]));
-                    binaryTreeY.Wait();
+                Task binaryTreeX = Task.Factory.StartNew(() => BinarySearchTree.InsertX(rootX, balls[i]));
+                Task binaryTreeY = Task.Factory.StartNew(() => BinarySearchTree.InsertY(rootY, balls[i]));
+                binaryTreeX.Wait();
+                binaryTreeY.Wait();
             }
         }
 

@@ -1,7 +1,4 @@
 ﻿using Dane;
-using System.Device.Location;
-using System.Drawing;
-using System.Windows.Forms;
 
 namespace Logika
 {

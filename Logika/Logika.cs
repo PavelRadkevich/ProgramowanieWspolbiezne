@@ -10,7 +10,7 @@ namespace Logika
 {
     public static class Logika
     {
-        public static Ball DrawBall(Window window, Random rnd)
+        public static Ball DrawBall(Window window, Random rnd, int numberOfBall)
         {
             Double HW = rnd.Next(20, 70);
             SolidColorBrush brush = new SolidColorBrush(Color.FromArgb(255, (byte)rnd.Next(256), (byte)rnd.Next(256), (byte)rnd.Next(256)));
@@ -25,7 +25,7 @@ namespace Logika
             Canvas canvas = (Canvas)window.FindName("CanvasMyWindow");
             canvas.Children.Add(ellipse);
             Vector2 direction = GetRandomDirection(rnd);
-            Ball b = new Ball(ellipse, ellipse.Width, Canvas.GetLeft(ellipse), Canvas.GetTop(ellipse), direction);
+            Ball b = new Ball(ellipse, ellipse.Width, Canvas.GetLeft(ellipse), Canvas.GetTop(ellipse), direction, numberOfBall);
             return b;
         }
 

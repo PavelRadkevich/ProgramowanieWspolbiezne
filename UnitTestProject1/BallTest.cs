@@ -1,7 +1,5 @@
 ﻿using Dane;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
-using System;
 using System.Numerics;
 using System.Windows.Shapes;
 
