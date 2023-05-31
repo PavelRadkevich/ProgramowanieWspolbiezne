@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Timers;
 
 namespace Prezentacja.Model
 {
@@ -20,8 +21,8 @@ namespace Prezentacja.Model
         public Canvas canvas { private get; set; }
         public List<Ball> balls = new List<Ball>();
         public bool moving { get; set; }
-        public Node rootX { get; set; } = new Node ();
-        public Node rootY { get; set; } = new Node ();
+        public Node rootX { get; set; } = new Node();
+        public Node rootY { get; set; } = new Node();
         public int speed
         {
             get { return speed_; }
@@ -41,12 +42,13 @@ namespace Prezentacja.Model
             }
         }
         private int numberOfBall = 0;
+        private System.Timers.Timer aTimer;
         public Model()
         {
             ButtonStart = new ViewModel.ButtonStart(this);
             ButtonStop = new ViewModel.ButtonStop(this);
             moving = false;
-            Task Logs = Task.Factory.StartNew(() => sendDiagnostics());
+            setTimer();
             Task.Run(() =>
             {
                 while (true)
@@ -82,7 +84,7 @@ namespace Prezentacja.Model
             canvas = (Canvas)Window.FindName("CanvasMyWindow");
             for (int i = balls.Count; i < amount_; i++)
             {
-                
+
                 Ball ball = (Ball)Logika.Logika.DrawBall(Window, rnd, numberOfBall);
                 balls.Add(ball);
                 numberOfBall++;
@@ -136,12 +138,13 @@ namespace Prezentacja.Model
                 {
                     Task.Run(() =>
                         {
-                        lock (b)
-                        {
-                            Point point = Logika.Logika.PointMovingOfBall(b, b.speed * speed_);
-                            b.x = point.X;
-                            b.y = point.Y;
-                                if (CheckCollisions(rootX)) {
+                            lock (b)
+                            {
+                                Point point = Logika.Logika.PointMovingOfBall(b, b.speed * speed_);
+                                b.x = point.X;
+                                b.y = point.Y;
+                                if (CheckCollisions(rootX))
+                                {
                                     Logika.Logika.MovingOfBall(b, b.speed * speed_, point);
                                 }
                                 else
@@ -149,7 +152,7 @@ namespace Prezentacja.Model
                                     CheckCollisions(rootY);
                                     Logika.Logika.MovingOfBall(b, b.speed * speed_, point);
                                 }
-                        }
+                            }
                         });
                 }
                 Thread.Sleep(1);
@@ -173,17 +176,20 @@ namespace Prezentacja.Model
                 binaryTreeY.Wait();
             }
         }
-        private async void sendDiagnostics()
+        private async void setTimer()
         {
-            while (true)
-            {
-                foreach (Ball b in balls)
-                {
-                    b.sendDiagnostic();
-                }
-                await Task.Delay(1000);
-            }
+            aTimer = new System.Timers.Timer(1000);
+            aTimer.Elapsed += sendDiagnostics;
+            aTimer.AutoReset = true;
+            aTimer.Enabled = true;
         }
 
+        private void sendDiagnostics(object sender, EventArgs e)
+        {
+            foreach (Ball b in balls)
+            {
+                b.sendDiagnostic();
+            }
+        }
     }
 }
